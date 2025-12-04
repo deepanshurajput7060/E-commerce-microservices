@@ -16,5 +16,11 @@ public class GlobalExceptionHandler {
 		ApiResponse apiResponse = new ApiResponse(ex.getMessage(), false);		
 		return new ResponseEntity<ApiResponse> (apiResponse, HttpStatus.NOT_FOUND);		
 	}
+	
+	@ExceptionHandler (value = UserAlreadyExistsException.class)
+	public ResponseEntity<ApiResponse> handlerUserAlreadyExistsException(UserAlreadyExistsException ex){		
+		ApiResponse apiResponse = new ApiResponse(ex.getMessage(), false);		
+		return new ResponseEntity<ApiResponse> (apiResponse, HttpStatus.CONFLICT);		
+	}
 
 }

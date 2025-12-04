@@ -8,5 +8,5 @@ import com.dee.ecommerce.user_service.entity.Address;
 
 public interface AddressRepository extends JpaRepository<Address, Long> {
 
-    List<Address> findByUserId(Long userId);
+    List<Address> findByUserId(String userId);
 }
