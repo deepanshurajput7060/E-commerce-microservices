@@ -8,7 +8,7 @@ import com.dee.ecommerce.user_service.dto.ApiResponse;
 import com.dee.ecommerce.user_service.dto.UserProfileRequest;
 import com.dee.ecommerce.user_service.dto.UserProfileResponse;
 import com.dee.ecommerce.user_service.entity.User;
-import com.dee.ecommerce.user_service.exception.UserNotFoundException;
+import com.dee.ecommerce.user_service.exception.ResourceNotFoundException;
 import com.dee.ecommerce.user_service.repository.UserRepository;
 import com.dee.ecommerce.user_service.service.UserService;
 
@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService{
 		logger.info("Updating user profile: {}", userId);
 		
 		User user = userRepository.findById(userId)
-								.orElseThrow(() -> new UserNotFoundException(userId));
+								.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 		
 		user.setFullName(request.getFullName());
 		user.setPhone(request.getPhone());
@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService{
 	    logger.info("Fetching user profile for userId: {}", userId);
 
 	    User user = userRepository.findById(userId)
-	            .orElseThrow(() -> new UserNotFoundException(userId));
+	            .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
 	    UserProfileResponse response = UserProfileResponse.builder()
 	            .userId(user.getUserId())  // fetch from DB

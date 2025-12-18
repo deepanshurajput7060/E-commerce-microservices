@@ -24,10 +24,10 @@ public class UserEventListener {
 	@KafkaListener (topics = "USER_REGISTERED", groupId = "user-service-group")
 	public void handleUserRegistered(UserRegisteredEvent event) {
 		
-		logger.info("Received USER_REGISTERED event for userId: {}", event.getUserId());
+		logger.info("Received USER_REGISTERED event for userId: {}", event.getAuthId());
 		
 		User user = User.builder()
-						.userId(event.getUserId())
+						.userId(event.getAuthId())
 						.email(event.getEmail())
 						.createdAt(LocalDateTime.now())
 						.updatedAt(LocalDateTime.now())
@@ -35,6 +35,6 @@ public class UserEventListener {
 		
 		userRepository.save(user);
 		
-		logger.info("User created in User Service: {}", event.getUserId());
+		logger.info("User created in User Service: {}", event.getAuthId());
 	}
 }
