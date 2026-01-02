@@ -1,3 +1,36 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: api-gateway
+
+# only if we want default routes
+#  cloud:
+#    gateway:
+#      discovery:
+#        locator:
+#          enable: true
+#          lower-case-service-id: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userServiceCB:
+        failure-rate-threshold: 50
+        minimum-number-of-calls: 5
+        sliding-window-size: 10
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+      authServiceCB:
+        failure-rate-threshold: 50
+        minimum-number-of-calls: 5
+        sliding-window-size: 10
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
