@@ -29,6 +29,15 @@ public class RouteConfig {
                                 )
                         )
                         .uri("lb://auth-service"))
+                .route("product-service", r -> r
+                        .path("/api/products/**")
+                        .filters(f -> f
+                                .circuitBreaker(cb -> cb
+                                        .setName("productServiceCB")
+                                        .setFallbackUri("forward:/product-fallback")
+                                )
+                        )
+                        .uri("lb://product-service"))
                 .build();
     }
 }

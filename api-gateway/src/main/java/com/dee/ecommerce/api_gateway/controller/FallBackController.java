@@ -17,4 +17,9 @@ public class FallBackController {
     public Mono<String> authFallback() {
         return Mono.just("Auth Service is currently unavailable. Please try later.");
     }
+
+    @GetMapping("/product-fallback")
+    public Mono<String> productFallback() {
+        return Mono.just("Product Service is currently unavailable. Please try later.");
+    }
 }

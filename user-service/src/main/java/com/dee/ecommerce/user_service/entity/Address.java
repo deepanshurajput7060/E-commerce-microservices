@@ -8,6 +8,10 @@ import lombok.*;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.time.LocalDateTime;
 
@@ -18,6 +22,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Address {
 
     @Id
@@ -29,38 +34,42 @@ public class Address {
     private User user;
 
     @NotBlank(message = "House No is required")
+    @Column(nullable = false) // Added database constraint
     private String houseNo;
 
     @NotBlank(message = "Street is required")
     @Size(max = 150)
+    @Column(nullable = false, length = 150) // Synced size and nullability
     private String street;
 
     @NotBlank(message = "City is required")
     @Size(max = 50)
+    @Column(nullable = false, length = 50)
     private String city;
 
     @NotBlank(message = "State is required")
     @Size(max = 50)
+    @Column(nullable = false, length = 50)
     private String state;
 
     @NotBlank(message = "Pincode is required")
-    @Pattern(
-            regexp = "^[1-9][0-9]{5}$",
-            message = "Invalid pincode. Must be exactly 6 digits (0-9) and cannot start with 0."
-    )
+    @Pattern(regexp = "^[1-9][0-9]{5}$", message = "Invalid pincode...")
+    @Column(nullable = false, length = 6) // Enforced 6 chars in DB
     private String pincode;
 
     @NotBlank(message = "Country is required")
     @Size(max = 50)
+    @Column(nullable = false, length = 50)
     private String country;
 
-    @Column(name = "is_default")
+    @Column(name = "is_default", nullable = false) // Boolean should also be NOT NULL
     private boolean isDefault = false;
 
-    @CreationTimestamp
-    @Column(updatable = false)
+    @CreatedDate
+    @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
+    @LastModifiedDate
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }
