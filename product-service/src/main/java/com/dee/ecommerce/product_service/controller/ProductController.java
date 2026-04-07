@@ -5,6 +5,7 @@ import com.dee.ecommerce.product_service.dto.ProductCreateRequest;
 import com.dee.ecommerce.product_service.dto.ProductResponse;
 import com.dee.ecommerce.product_service.dto.ProductUpdateRequest;
 import com.dee.ecommerce.product_service.service.ProductService;
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ public class ProductController {
 
     private final ProductService productService;
 
-    // CREATE
+    //@PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ApiResponse> createProduct(
             @Valid @RequestBody ProductCreateRequest request) {
@@ -31,7 +32,7 @@ public class ProductController {
                 .body(productService.createProduct(request));
     }
 
-    // READ - ALL
+    //@PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping
     public ResponseEntity<Page<ProductResponse>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
@@ -43,7 +44,7 @@ public class ProductController {
         );
     }
 
-    // READ - BY ID
+    //@PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/{productId}")
     public ResponseEntity<ProductResponse> getProduct(
             @PathVariable Long productId) {
@@ -53,7 +54,7 @@ public class ProductController {
         );
     }
 
-    // UPDATE
+    //@PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{productId}")
     public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable Long productId,
@@ -64,7 +65,7 @@ public class ProductController {
         );
     }
 
-    // DELETE
+    //@PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{productId}")
     public ResponseEntity<ApiResponse> deleteProduct(
             @PathVariable Long productId) {

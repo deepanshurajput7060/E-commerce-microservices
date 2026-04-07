@@ -15,6 +15,26 @@ spring:
       ddl-auto: update
     show-sql: true
 
+logging:
+  level:
+    io.github.resilience4j: DEBUG
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      productService:
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        slidingWindowSize: 10
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+  retry:
+    instances:
+      productService:
+        maxAttempts: 3
+        maxDuration: 2s
+
+
 eureka:
   client:
     service-url:

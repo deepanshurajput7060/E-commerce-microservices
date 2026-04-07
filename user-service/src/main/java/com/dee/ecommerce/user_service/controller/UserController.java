@@ -1,5 +1,6 @@
 package com.dee.ecommerce.user_service.controller;
 
+import com.dee.ecommerce.user_service.utils.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping ("/users")
+@RequestMapping ("/api/users")
 @RequiredArgsConstructor
 @Validated
 public class UserController {
@@ -23,23 +24,24 @@ public class UserController {
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 	
 	private final UserService userService;
-	
-	@GetMapping ("/{userId}")
-	public ResponseEntity<UserProfileResponse> getProfile(@PathVariable String userId) {
-		
-		logger.info("API Request: Get profile for User: {}", userId);		
-		UserProfileResponse response = userService.getProfile(userId);		
-		return ResponseEntity.ok(response);		
+
+	@GetMapping("/me")
+	public ResponseEntity<UserProfileResponse> getProfile() {
+
+		String userId = SecurityUtils.getCurrentUserId();
+
+		return ResponseEntity.ok(userService.getProfile(userId));
 	}
-	
-	@PutMapping ("/update/{userId}")
+
+
+	@PutMapping("/me")
 	public ResponseEntity<ApiResponse> updateProfile(
-											@PathVariable String userId,
-											@Valid @RequestBody UserProfileRequest request
-											) {
-		
-		logger.info("API Request: Update profile for userId: {}", userId);
-        ApiResponse response = userService.updateProfile(userId, request);
-        return ResponseEntity.ok(response);		
+			@Valid @RequestBody UserProfileRequest request) {
+
+		String userId = SecurityUtils.getCurrentUserId();
+		logger.info("Update profile for logged-in user: {}", userId);
+
+		return ResponseEntity.ok(userService.updateProfile(userId, request));
 	}
+
 }

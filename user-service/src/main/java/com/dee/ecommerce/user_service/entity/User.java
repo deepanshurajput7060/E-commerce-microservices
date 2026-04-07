@@ -21,7 +21,18 @@ import lombok.Setter;
 
 
 @Entity
-@Table(name = "users")
+@Table(
+        name = "users",
+        indexes = {
+                // login & lookup
+                @Index(name = "idx_user_email", columnList = "email"),
+                @Index(name = "idx_user_phone", columnList = "phone"),
+                // sorting / analytics
+                @Index(name = "idx_user_created_at", columnList = "created_at"),
+                // optional search
+                @Index(name = "idx_user_full_name", columnList = "full_name")
+        }
+)
 @Getter
 @Setter
 @Builder
@@ -36,21 +47,17 @@ public class User {
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(unique = true, length = 100)
     private String email;
 
-    @NotBlank(message = "Full name is required")
     @Size(max = 100)
-    @Column(nullable = false, length = 100)
     private String fullName;
 
-    @NotBlank(message = "Phone number is required")
     @Size(max = 15)
-    @Column(nullable = false, unique = true, length = 15)
     private String phone;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10) // Define length for Enum storage
+    @Column(nullable = true)
     private Gender gender;
 
     @Column(name = "date_of_birth")

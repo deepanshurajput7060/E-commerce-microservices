@@ -1,10 +1,8 @@
 package com.dee.ecommerce.product_service.service.impl;
 
-import com.dee.ecommerce.product_service.dto.ApiResponse;
-import com.dee.ecommerce.product_service.dto.ProductCreateRequest;
-import com.dee.ecommerce.product_service.dto.ProductResponse;
-import com.dee.ecommerce.product_service.dto.ProductUpdateRequest;
+import com.dee.ecommerce.product_service.dto.*;
 import com.dee.ecommerce.product_service.entity.Product;
+import com.dee.ecommerce.product_service.events.ProductCreatedEvent;
 import com.dee.ecommerce.product_service.exception.ResourceNotFoundException;
 import com.dee.ecommerce.product_service.repository.ProductRepository;
 import com.dee.ecommerce.product_service.service.ProductService;
@@ -15,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,22 +24,36 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository repository;
+    private final KafkaTemplate<String, ProductCreatedEvent> kafkaTemplate;
     private final ModelMapper mapper;
 
     @Override
     public ApiResponse createProduct(ProductCreateRequest request) {
+
         log.info("Creating Product with name: {}", request.getName());
 
-        Product product = Product.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .price(request.getPrice())
-                .quantity(request.getQuantity())
+        Product product = new Product();
+        product.setName(request.getName());
+        product.setPrice(request.getPrice());
+        product.setDescription(request.getDescription());
+
+        Product saved = repository.save(product);
+
+        log.info("Product created successfully with ID: {}", saved.getId());
+
+        // 🔥 SEND EVENT
+        ProductCreatedEvent event = ProductCreatedEvent.builder()
+                .productId(saved.getId())
                 .build();
 
-        repository.save(product);
-
-        log.info("Product created successfully with ID: {}", product.getId());
+        kafkaTemplate.send("product-created-topic", saved.getId().toString(), event)
+                .whenComplete((result, ex) -> {
+                    if (ex != null) {
+                        log.error("Failed to send event | productId={}", saved.getId(), ex);
+                    } else {
+                        log.info("Event sent successfully | productId={}", saved.getId());
+                    }
+                });
 
         return new ApiResponse("Product created successfully", true);
     }
@@ -53,16 +66,18 @@ public class ProductServiceImpl implements ProductService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
 
         return repository.findAll(pageable)
-                        .map(product -> mapper.map(product, ProductResponse.class));
+                .map(product -> mapToResponse(product));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ProductResponse getProductById(Long id) {
-        log.info("Fetching Product by Id: {}", id);
+    public ProductResponse getProductById(Long productId) {
 
-        Product product = getProductOrThrow(id);
-        return mapper.map(product, ProductResponse.class);
+        log.info("Fetching Product by Id: {}", productId);
+
+        Product product = getProductOrThrow(productId);
+
+        return mapToResponse(product);
     }
 
     @Override
@@ -75,7 +90,7 @@ public class ProductServiceImpl implements ProductService {
         Product updatedProduct = repository.save(product);
         log.info("Product updated successfully | id={}", id);
 
-        return mapper.map(updatedProduct, ProductResponse.class);
+        return mapToResponse(updatedProduct);
     }
 
     @Override
@@ -89,7 +104,8 @@ public class ProductServiceImpl implements ProductService {
         return new ApiResponse("Product deleted successfully", true);
     }
 
-    // Helper method for Fetching Product
+    // Helper method
+
     private Product getProductOrThrow(Long id) {
         Product product = repository.findById(id)
                 .orElseThrow(() -> {
@@ -97,5 +113,16 @@ public class ProductServiceImpl implements ProductService {
                     return new ResourceNotFoundException("Product", "Id", id.toString());
                 });
         return product;
+    }
+
+    private ProductResponse mapToResponse(Product product) {
+        return ProductResponse.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .price(product.getPrice())
+                .description(product.getDescription())
+                .createdAt(product.getCreatedAt())
+                .updatedAt(product.getUpdatedAt())
+                .build();
     }
 }

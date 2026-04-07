@@ -5,14 +5,16 @@ import com.dee.ecommerce.user_service.dto.AddressRequest;
 import com.dee.ecommerce.user_service.dto.AddressResponse;
 import com.dee.ecommerce.user_service.dto.ApiResponse;
 import com.dee.ecommerce.user_service.service.AddressService;
+import com.dee.ecommerce.user_service.utils.SecurityUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
-@RequestMapping("/users/{userId}/addresses")
+@RequestMapping("/api/users/me/addresses")
 @RequiredArgsConstructor
 public class AddressController {
 
@@ -20,44 +22,50 @@ public class AddressController {
 
     @GetMapping
     public ResponseEntity<Page<AddressResponse>> getAllAddresses(
-            @PathVariable String userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
+
+        String userId = SecurityUtils.getCurrentUserId();
 
         return ResponseEntity.ok(addressService.getAllAddresses(userId, page, size));
     }
 
     @GetMapping("/{addressId}")
     public ResponseEntity<AddressResponse> getAddress(
-            @PathVariable String userId,
             @PathVariable Long addressId) {
+
+        String userId = SecurityUtils.getCurrentUserId();
 
         return ResponseEntity.ok(addressService.getAddressById(userId, addressId));
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<ApiResponse> createAddress(
-            @PathVariable String userId,
             @Valid @RequestBody AddressRequest request) {
+
+        String userId = SecurityUtils.getCurrentUserId();
 
         return ResponseEntity.ok(addressService.createAddress(userId, request));
     }
 
-    @PutMapping("/{addressId}/update")
+    @PutMapping("/{addressId}")
     public ResponseEntity<ApiResponse> updateAddress(
-            @PathVariable String userId,
             @PathVariable Long addressId,
             @Valid @RequestBody AddressRequest request) {
+
+        String userId = SecurityUtils.getCurrentUserId();
 
         return ResponseEntity.ok(addressService.updateAddress(userId, addressId, request));
     }
 
-    @DeleteMapping("{addressId}/delete")
+    @DeleteMapping("/{addressId}")
     public ResponseEntity<ApiResponse> deleteAddress(
-            @PathVariable String userId,
             @PathVariable Long addressId) {
 
+        String userId = SecurityUtils.getCurrentUserId();
+
         addressService.deleteAddress(userId, addressId);
+
         return ResponseEntity.ok(new ApiResponse("Address deleted successfully", true));
     }
 }

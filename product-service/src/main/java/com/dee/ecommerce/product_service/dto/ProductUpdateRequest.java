@@ -26,8 +26,5 @@ public class ProductUpdateRequest {
 
     @Size(max = 500, message = "Description cannot exceed 500 characters")
     private String description;
-
-    @Min(value = 0, message = "Quantity cannot be negative")
-    private Integer quantity;
 }
 

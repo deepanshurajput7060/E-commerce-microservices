@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +47,7 @@ public class AddressServiceImpl implements AddressService {
 
         User user = validateUserExist(userId);
 
-        PageRequest pageRequest = PageRequest.of(page, size);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdAt").descending());
         logger.debug("Created PageRequest: {}", pageRequest);
 
         Page<Address> addressPage =

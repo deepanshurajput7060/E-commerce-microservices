@@ -16,7 +16,20 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_addresses")
+@Table(
+        name = "user_addresses",
+        indexes = {
+                // MOST IMPORTANT (foreign key lookup)
+                @Index(name = "idx_address_user", columnList = "user_id"),
+                // default address lookup
+                @Index(name = "idx_address_default", columnList = "is_default"),
+                // search filters
+                @Index(name = "idx_address_city", columnList = "city"),
+                @Index(name = "idx_address_pincode", columnList = "pincode"),
+                // sorting / pagination
+                @Index(name = "idx_address_created_at", columnList = "created_at")
+        }
+)
 @Getter
 @Setter
 @Builder
@@ -62,6 +75,7 @@ public class Address {
     @Column(nullable = false, length = 50)
     private String country;
 
+    @Builder.Default
     @Column(name = "is_default", nullable = false) // Boolean should also be NOT NULL
     private boolean isDefault = false;
 
@@ -72,4 +86,5 @@ public class Address {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
 }

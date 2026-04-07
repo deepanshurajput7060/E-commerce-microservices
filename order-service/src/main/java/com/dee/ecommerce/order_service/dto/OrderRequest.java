@@ -1,20 +1,19 @@
 package com.dee.ecommerce.order_service.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
-@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderRequest {
-    @NotBlank(message = "User ID is required")
-    String userId;
 
+    @Valid
     @NotEmpty(message = "Order must contain at least one item")
-    List<OrderItemRequest> items;
+    private List<OrderItemRequest> items;
 }

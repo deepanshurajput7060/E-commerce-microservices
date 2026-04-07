@@ -2,12 +2,16 @@ package com.dee.ecommerce.order_service.dto;
 
 import com.dee.ecommerce.order_service.util.OrderStatus;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class OrderResponse {
     private Long orderId;

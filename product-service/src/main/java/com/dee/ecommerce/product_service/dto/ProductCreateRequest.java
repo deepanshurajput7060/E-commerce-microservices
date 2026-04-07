@@ -24,8 +24,4 @@ public class ProductCreateRequest {
 
     @Size(max = 500, message = "Description cannot exceed 500 characters")
     private String description;
-
-    @NotNull(message = "Quantity is required")
-    @Min(value = 0, message = "Quantity cannot be negative")
-    private Integer quantity;
 }

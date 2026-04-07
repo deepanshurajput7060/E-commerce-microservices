@@ -38,13 +38,15 @@ public class User {
 	private String name;
 
 	@NotBlank(message = "Password is required")
-	@Column(nullable = false) // Note: length should be enough for Bcrypt (usually 60)
+	@Column(nullable = false)
 	private String password;
 
+	// Set<String> roles stored in a separate table (user_roles)
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(
 			name = "user_roles",
-			joinColumns = @JoinColumn(name = "user_id"))
+			joinColumns = @JoinColumn(name = "user_id")
+	)
 	@Column(name = "role", length = 20)
 	private Set<String> roles = new HashSet<>();
 
